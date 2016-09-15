@@ -984,6 +984,13 @@ abstract class TelephonyConnection extends Connection {
         }
         Log.v(this, "Update state from %s to %s for %s", mConnectionState, newState, this);
 
+        final String number = mOriginalConnection.getAddress();
+        final Phone phone = mOriginalConnection.getCall().getPhone();
+        int cause = mOriginalConnection.getDisconnectCause();
+        final boolean isEmergencyNumber = PhoneUtils.isLocalEmergencyNumber(
+                phone.getContext(), number);
+
+        Log.v(this, "Update state from %s to %s for %s", mConnectionState, newState, this);
         if (mConnectionState != newState) {
             mConnectionState = newState;
             switch (newState) {

@@ -610,6 +610,9 @@ public class NotificationMgr {
     void updateNetworkSelection(int serviceState) {
         if (TelephonyCapabilities.supportsNetworkSelection(mPhone)) {
             int subId = mPhone.getSubId();
+            int slotId = mPhone.getPhoneId();
+            final int PROVISIONED = 1;
+            int provisionStatus = PROVISIONED;
             if (SubscriptionManager.isValidSubscriptionId(subId)) {
                 // get the shared preference of network_selection.
                 // empty is auto mode, otherwise it is the operator alpha name
@@ -625,6 +628,15 @@ public class NotificationMgr {
 
                 if (DBG) log("updateNetworkSelection()..." + "state = " +
                         serviceState + " new network " + networkSelection);
+
+                try {
+                    //get current provision state of the SIM.
+                    provisionStatus = mExtTelephony.getCurrentUiccCardProvisioningStatus(slotId);
+                } catch (RemoteException ex) {
+                    if (DBG) log("Failed to get status for slotId: "+ slotId +" Exception: " + ex);
+                } catch (NullPointerException ex) {
+                    if (DBG) log("Failed to get status for slotId: "+ slotId +" Exception: " + ex);
+                }
 
                 if (serviceState == ServiceState.STATE_OUT_OF_SERVICE
                         && !TextUtils.isEmpty(networkSelection)) {
